@@ -29,6 +29,8 @@
 // PD1 connected to driver for stepper motor coil B
 // PD0 connected to driver for stepper motor coil B'
 
+#include "stdint.h"
+
 
 // Initialize Stepper interface
 void Stepper_Init(unsigned long period);
@@ -40,6 +42,9 @@ void Stepper_CW(uint32_t delay);
 // Move 1.8 degrees counterclockwise,
 // delay is the time to wait after each step in bus cycles
 void Stepper_CCW(uint32_t delay);
+
+void StepperR_CW(void);
+void StepperR_CCW(void);
 
 // Turn stepper motor to desired position
 // (0 <= desired <= 199)

@@ -53,49 +53,9 @@ int main(void){
 	PortA_Init();
   Stepper_Init(160000); // 10 ms for stepper, *50 = 500 ms for LED flash
 	EnableInterrupts();
-	LIGHT = 0x08;
+	//LIGHT = 0x08;
 	
   while(1){
-		// turn clockwise 180 degrees
-		// Conditions: Door is closed, trigger is active, sensor is present/aligns with trigger
-		
-		if(rotations == 1000 && doorOpen == 0){
-			doorOpen = 1;
-			LIGHT = 0x04;
-			rotations = 0;
-		}
-		
-		if(rotations == 1000 && doorOpen == 1){
-			doorOpen = 0;
-			LIGHT = 0x08;
-			rotations = 0;
-		}
-		/*
-		if((doorOpen == 0) && (presence == 0xFF) && (GPIO_PORTA_DATA_R == 0x00)){
-		LIGHT = 0;
-		for (i=0;i<1000; i++) {
-      Stepper_CW(10*T1ms);   // output every 10ms
-			if(i % 50 == 0){LIGHT ^= 0x02;}
-		}
-		doorOpen = 1;
-		LIGHT = 0x04; 
-		}
-		
-		// turn counter clockwise 180 degrees
-		// Conditions: Door is open, trigger is not active, sensor is low/aligns with trigger
-		if((doorOpen == 1) && (presence == 0) && (GPIO_PORTA_DATA_R == 0x80)){
-		LIGHT = 0;
-		for (i=0;i<1000; i++) {
-      Stepper_CCW(10*T1ms);   // output every 10ms
-			if(i % 50 == 0){LIGHT ^= 0x02;}
-		}
-		doorOpen = 0;
-		LIGHT = 0x08;
-		}
-		
-		
-		//Main*/
-		
 		
   }
 }
@@ -141,56 +101,17 @@ void PortA_Init(void){
 }	
 
 void GPIOPortF_Handler(void){
-	if(GPIO_PORTF_RIS_R & 0x10){
-		if(doorOpen == 0){
-			presence = 0xFF;
-		}
-		else{
-			presence = 0x00;
-		}
-		LIGHT = 0x02;
-
-	}
 	GPIO_PORTF_ICR_R = 0x11;
 
 }
 
 void SysTick_Handler(void){
-
-	if(doorOpen == 0 && presence == 0xFF){
-		Stepper_CW(0);
-		ledCounter += 1;
-		rotations += 1;
-	}
-	
-	if(doorOpen == 1 && presence == 0x00){
-		Stepper_CCW(0);
-		ledCounter += 1;
-		rotations += 1;
-	}
-	
-	if(ledCounter >= 50){LIGHT ^= 0x02; ledCounter = 0;}
-	
+	Stepper_CW(0);
+	StepperR_CW();
 }
 
 void GPIOPortA_Handler(void){
 	GPIO_PORTA_ICR_R = 0x80; // acknowledge
-	// Determine previous value of LED
-	/*
-	// When sensor is active, DATA = 0x00, else if no sensor it is 0x80
-	if(GPIO_PORTA_DATA_R == 0x80 && open == 0 && (detectDepart == 0))
-	{
-		detectApproach = 0xFF;
-	}
-	
- if (GPIO_PORTA_DATA_R == 0 && open == 1 && (detectApproach == 0))
-	{
-		detectDepart = 0xFF;
-	}
-	*/
-  if(GPIO_PORTA_DATA_R == 0x00 && doorOpen == 0){presence = 0xFF; LIGHT = 0x02;}
-  if(GPIO_PORTA_DATA_R == 0x80 && doorOpen == 1){presence = 0; LIGHT = 0x02;  }
-  
-	
+ 
 }
 
