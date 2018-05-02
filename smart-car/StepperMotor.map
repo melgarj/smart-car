@@ -24,7 +24,7 @@ Section Cross References
     stepper.o(i.StepperR_CCW) refers to stepper.o(.data) for r
     stepper.o(i.StepperR_CCW) refers to stepper.o(.constdata) for fsm2
     stepper.o(i.StepperR_CW) refers to stepper.o(.data) for r
-    stepper.o(i.StepperR_CW) refers to stepper.o(.constdata) for fsm
+    stepper.o(i.StepperR_CW) refers to stepper.o(.constdata) for fsm2
     stepper.o(i.Stepper_CCW) refers to stepper.o(.data) for s
     stepper.o(i.Stepper_CCW) refers to stepper.o(.constdata) for fsm
     stepper.o(i.Stepper_CW) refers to stepper.o(.data) for s

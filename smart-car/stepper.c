@@ -74,8 +74,8 @@ void Stepper_CCW(uint32_t delay){
 }
 
 void StepperR_CW(){
-	r = fsm[r].Next[clockwise];
-	STEPPERR = fsm[r].Out;
+	r = fsm2[r].Next[clockwise];
+	STEPPERR = fsm2[r].Out;
 }
 
 void StepperR_CCW(){
