@@ -3,18 +3,18 @@
 <title>Static Call Graph - [.\StepperMotor.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\StepperMotor.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Wed May 02 16:46:12 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Thu May 03 19:06:55 2018
 <BR><P>
 <H3>Maximum Stack Usage =          8 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-SysTick_Handler
+__rt_entry_sh &rArr; __user_setup_stackheap
 <P>
 <H3>
 Functions with no stack information
 </H3><UL>
  <LI><a href="#[7f]">Reset_Handler</a>
  <LI><a href="#[bb]">DisableInterrupts</a>
- <LI><a href="#[99]">EnableInterrupts</a>
+ <LI><a href="#[97]">EnableInterrupts</a>
  <LI><a href="#[bc]">StartCritical</a>
  <LI><a href="#[bd]">EndCritical</a>
  <LI><a href="#[be]">WaitForInterrupt</a>
@@ -700,7 +700,7 @@ Global Symbols
 
 <P><STRONG><a name="[bb]"></a>DisableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text), UNUSED)
 
-<P><STRONG><a name="[99]"></a>EnableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
+<P><STRONG><a name="[97]"></a>EnableInterrupts</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, startup.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -757,27 +757,27 @@ Global Symbols
 <P><STRONG><a name="[d]"></a>GPIOPortA_Handler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, steppertestmain.o(i.GPIOPortA_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
-<P><STRONG><a name="[2b]"></a>GPIOPortF_Handler</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, steppertestmain.o(i.GPIOPortF_Handler))
+<P><STRONG><a name="[2b]"></a>GPIOPortF_Handler</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, steppertestmain.o(i.GPIOPortF_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
-<P><STRONG><a name="[98]"></a>PortA_Init</STRONG> (Thumb, 162 bytes, Stack size 8 bytes, steppertestmain.o(i.PortA_Init))
+<P><STRONG><a name="[96]"></a>PortA_Init</STRONG> (Thumb, 162 bytes, Stack size 8 bytes, steppertestmain.o(i.PortA_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PortA_Init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[97]"></a>PortF_Init</STRONG> (Thumb, 202 bytes, Stack size 8 bytes, steppertestmain.o(i.PortF_Init))
+<P><STRONG><a name="[95]"></a>PortF_Init</STRONG> (Thumb, 202 bytes, Stack size 8 bytes, steppertestmain.o(i.PortF_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PortF_Init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[96]"></a>StepperR_CW</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stepper.o(i.StepperR_CW))
-<BR><BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+<P><STRONG><a name="[98]"></a>StepperR_CW</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stepper.o(i.StepperR_CW))
+<BR><BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[95]"></a>Stepper_CW</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stepper.o(i.Stepper_CW))
-<BR><BR>[Called By]<UL><LI><a href="#[c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+<P><STRONG><a name="[99]"></a>Stepper_CW</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, stepper.o(i.Stepper_CW))
+<BR><BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[93]"></a>Stepper_Init</STRONG> (Thumb, 202 bytes, Stack size 8 bytes, stepper.o(i.Stepper_Init))
@@ -788,26 +788,23 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[c]"></a>SysTick_Handler</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, steppertestmain.o(i.SysTick_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = SysTick_Handler
-</UL>
-<BR>[Calls]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_CW
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StepperR_CW
-</UL>
+<P><STRONG><a name="[c]"></a>SysTick_Handler</STRONG> (Thumb, 92 bytes, Stack size 0 bytes, steppertestmain.o(i.SysTick_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup.o(RESET)
 </UL>
 <P><STRONG><a name="[94]"></a>SysTick_Init</STRONG> (Thumb, 42 bytes, Stack size 0 bytes, systick.o(i.SysTick_Init))
 <BR><BR>[Called By]<UL><LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_Init
 </UL>
 
-<P><STRONG><a name="[8a]"></a>main</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, steppertestmain.o(i.main))
+<P><STRONG><a name="[8a]"></a>main</STRONG> (Thumb, 124 bytes, Stack size 0 bytes, steppertestmain.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8 + Unknown Stack Size
 <LI>Call Chain = main &rArr; Stepper_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_Init
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PortF_Init
-<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PortA_Init
-<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EnableInterrupts
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_CW
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StepperR_CW
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PortF_Init
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PortA_Init
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EnableInterrupts
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>

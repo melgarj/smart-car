@@ -40,12 +40,17 @@ void PortF_Init(void);
 void PortA_Init(void);
 void EnableInterrupts(void);
 
-unsigned int presence = 0; // init at closed state
-unsigned int doorOpen = 0; // activates when door is fully opened
-unsigned int activate = 1;
-unsigned int ledCounter = 0;
-unsigned int rotations = 0;
+//unsigned int presence = 0; // init at closed state
+//unsigned int doorOpen = 0; // activates when door is fully opened
+//unsigned int activate = 1;
+//unsigned int ledCounter = 0;
 
+unsigned int rRotations = 0;
+unsigned int lRotations = 0;
+unsigned int rRotation = 0;
+unsigned int lRotation = 0;
+unsigned int forward = 0;
+unsigned int backward = 0;
 
 int main(void){
 	unsigned int i=0;
@@ -55,7 +60,15 @@ int main(void){
 	EnableInterrupts();
 	//LIGHT = 0x08;
 	
+	
+	
   while(1){
+		
+		if(rRotation == 1 && lRotation == 1){StepperR_CW(); Stepper_CW(0);lRotations += 1; rRotations += 1;}
+		else if (rRotation == 0 && lRotation == 1){
+			Stepper_CW(0); lRotations += 1;
+			if (lRotations == 4500){rRotations = 0; lRotations = 0;}
+		}
 		
   }
 }
@@ -102,12 +115,18 @@ void PortA_Init(void){
 
 void GPIOPortF_Handler(void){
 	GPIO_PORTF_ICR_R = 0x11;
+	
+	if(GPIO_PORTF_RIS_R & 0x01){forward = 1;}
+	if(GPIO_PORTF_RIS_R & 0x10){backward = 1;}
 
 }
 
 void SysTick_Handler(void){
-	Stepper_CW(0);
-	StepperR_CW();
+	
+	if(forward == 1 && rRotations < 4000 && lRotations < 4000){rRotation = 1; lRotation = 1;}
+	else if (forward == 1 && rRotations >= 4000 && lRotations >= 4000){rRotation = 0; rRotations = 0;}
+	else{rRotation = 0; lRotation = 0;}
+
 }
 
 void GPIOPortA_Handler(void){
