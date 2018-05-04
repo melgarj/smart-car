@@ -117,13 +117,21 @@ int main(void){
 					StepperR_CW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				// Upon pressing SW2, backward = 1, move card backward
-				if(backward == 1)
+				if(backward == 1 && forward == 0)
 				{
 					StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){forward = 0; on = 0; rSteps = 0; lSteps = 0;}
-				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){rotating = 1; rSteps = 0; lSteps = 0;}
+				if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){
+					if(forward == 1){forward = 0; on = 0;}
+					if (backward == 1){rotating = 1;}
+					rSteps = 0; lSteps = 0; 
+				}
+				
+				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){
+					rotating = 1; rSteps = 0; lSteps = 0;
+					if(backward == 1){on = 0;}
+				}
 				//////////////////////////////////////////////////
 				
 			}
@@ -144,10 +152,14 @@ int main(void){
 				// When it is backward, we move the left wheel
 				if(backward == 1)
 				{
+					LIGHT = 0x02;
 					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				if(rSteps >= 500 && lSteps >= 500){rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08;}
+				if(rSteps >= 500 && lSteps >= 500 && (forward == 1 || backward ==1)){
+					rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08; 
+					if(backward == 1){detected = 0;}
+				}
 			}
 			
 		}
