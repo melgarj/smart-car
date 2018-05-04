@@ -122,12 +122,14 @@ int main(void){
 					StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
+				// Upon rotating 360 deg, turn car off if it is moving forward, if backwards, begin a rotation
 				if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){
 					if(forward == 1){forward = 0; on = 0;}
 					if (backward == 1){rotating = 1;}
 					rSteps = 0; lSteps = 0; 
 				}
 				
+				// Upon rotating 720 degrees, begin rotation if it is moving forward, if backwards stop the car
 				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){
 					rotating = 1; rSteps = 0; lSteps = 0;
 					if(backward == 1){on = 0;}
@@ -141,22 +143,24 @@ int main(void){
 			// Should only trigger if we want one wheel forward
 			if(rRotation == 1 ^ lRotation == 1)
 			{
+				// Red LED will notify that a rotation is in progress
 				toggle = 0;
-				// When it is forward, we move the right wheel CCW and left wheel CW to perform a 90 deg left turn
+				// When it is forward, we move the right wheel CW and left wheel CCW to perform a 90 deg left turn
 				if(forward == 1)
 				{
 					LIGHT = 0x02;
-					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
+					StepperR_CW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				// When it is backward, we move the left wheel
+				// When it is backward, we move the right wheel CCW and left wheel CW to perform a 90 deg right turn
 				if(backward == 1)
 				{
 					LIGHT = 0x02;
 					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				if(rSteps >= 500 && lSteps >= 500 && (forward == 1 || backward ==1)){
+				// Upon completing a 90 deg turn, car will move forward
+				if(rSteps >= 1000 && lSteps >= 1000 && (forward == 1 || backward ==1)){
 					rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08; 
 					if(backward == 1){detected = 0;}
 				}
@@ -230,13 +234,13 @@ void SysTick_Handler(void){
 	else if (on == 1 && (forward == 1 || backward == 1)){rRotation = 1; lRotation = 1; toggle = 1;}
 	else{rRotation = 0; lRotation = 0;}*/
 	
-	// 
+	// Upon completion of a rotation, reset all and go forward again
 	if(on == 1 && (backward == 1 || forward == 1) && (rotate == 1))
 		{
 			toggle = 1; lRotation = 1; rRotation = 1; rSteps = 0; lSteps = 0; rotate = 0;
 		}
 	
-	// 
+	// If rotating begins, notify only one wheel should move forward
 	else if(on == 1 && rotating == 1 && rotate == 0)
 	{
 		toggle = 1;
@@ -244,11 +248,13 @@ void SysTick_Handler(void){
 		if(backward == 1){lRotation = 1; rRotation = 0;}
 	}
 	
+	// Regular forward movement
 	else if(on == 1 && (forward == 1 || backward == 1) && rotate == 0)
 	{
 		rRotation = 1; lRotation = 1; toggle = 1;
 	}
 
+	// When no options available, stay in one spot
 	else{rRotation = 0; lRotation = 0; on = 0;}
 
 

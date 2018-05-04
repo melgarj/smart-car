@@ -2625,11 +2625,11 @@
       </Doc>
       <Doc>
         <Name>.\StepperTestMain.c</Name>
-        <ColumnNumber>21</ColumnNumber>
-        <TopLine>97</TopLine>
-        <CurrentLine>135</CurrentLine>
+        <ColumnNumber>34</ColumnNumber>
+        <TopLine>114</TopLine>
+        <CurrentLine>149</CurrentLine>
         <Folding>1</Folding>
-        <ContractedFolders>75,211</ContractedFolders>
+        <ContractedFolders>75,225</ContractedFolders>
         <PaneID>0</PaneID>
       </Doc>
       <Doc>
