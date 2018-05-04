@@ -53,6 +53,14 @@ unsigned int on = 0;
 unsigned int forward = 0;
 unsigned int backward = 0;
 unsigned int toggle = 0;
+unsigned int triggerSensor = 0;
+unsigned int detected = 0;
+unsigned int rotate = 0;
+unsigned int rotating =  0;
+
+//test vars
+unsigned int executed = 0;
+unsigned int executed2 = 0;
 
 int main(void){
 	unsigned int i=0;
@@ -65,20 +73,85 @@ int main(void){
 	
 	
   while(1){
+		/*
 		if(toggle){
 		
 		if(forward == 1 && rRotation == 1 && lRotation == 1){
-		toggle = 0; StepperR_CW(); Stepper_CW(0); rSteps += 1; lSteps += 1;}
+			toggle = 0; StepperR_CW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
+			if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){
+				on = 0; forward = 0; detected = 0; rSteps = 0; lSteps = 0;
+				rRotation = 0; lRotation = 0;}
+		}
+		
+		if(backward == 1 && rRotation == 1 && lRotation == 1 && forward == 0)
+		{
+			toggle = 0; StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
+			if(rSteps >= 2000 && lSteps >= 2000){rotate = 1; rSteps = 0; lSteps = 0;}
+		}
 		
 		if(forward == 1 && rRotation == 0 && lRotation == 1){
 			toggle = 0; Stepper_CW(0); lSteps += 1;
-			if(lSteps >= 4500){forward = 0; on = 0; lSteps = 0;}
-		}}
+			if(lSteps >= 4500){triggerSensor = 1; lSteps = 0;}
+		}
 		
-		
-		
-  }
+		if(backward == 1 && rRotation == 1 && lRotation == 0){
+			toggle = 0; StepperR_CW(); rSteps += 1; Stepper_CCW(0);
+			executed += 1;
+			if(rSteps >= 500){forward = 1; rSteps = 0; lSteps = 0;}
+		}
+	}*/
+	
+	
+		// Execture every 10 ms
+		if(toggle == 1)
+		{
+			// Rotate both wheels same direction, triggerSensor high = object in front = car must stop
+			if(rRotation == 1 && lRotation == 1 && triggerSensor == 0) // Move Forward
+			{
+				toggle = 0;
+				
+				// Upon pressing SW1, forward = 1, move car forward
+				if(forward == 1)
+				{
+					StepperR_CW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
+				}
+				// Upon pressing SW2, backward = 1, move card backward
+				if(backward == 1)
+				{
+					StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
+				}
+				
+				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){rotating = 1;}
+				//////////////////////////////////////////////////
+				
+			}
+			
+			
+			
+			// Should only trigger if we want one wheel forward
+			if(rRotation == 1 ^ lRotation == 1)
+			{
+				toggle = 0;
+				
+				// When it is forward, we move the right wheel CCW and left wheel CW to perform a 90 deg left turn
+				if(forward == 1)
+				{
+					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
+				}
+				
+				// When it is backward, we move the left wheel
+				if(backward == 1)
+				{
+					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
+				}
+				
+				if(rSteps >= 500 && lSteps >= 500){rotating = 0; rotate = 1; forward = 1;}
+			}
+			
+		}
+	}
 }
+
 
 
 void PortF_Init(void){volatile unsigned long delay;
@@ -122,9 +195,13 @@ void PortA_Init(void){
 
 void GPIOPortF_Handler(void){
 	
+	// Pressing SW1 moves car forward
 	if(GPIO_PORTF_RIS_R & 0x01){forward = 1;}
+	
+	// Pressing SW2 moves car backward
 	if(GPIO_PORTF_RIS_R & 0x10){backward = 1;}
 	
+	// Any button press turns the car on
 	on = 1;
 	
 	GPIO_PORTF_ICR_R = 0x11;
@@ -132,14 +209,43 @@ void GPIOPortF_Handler(void){
 }
 
 void SysTick_Handler(void){
-	if(on == 1 && rSteps < 4000 && lSteps < 4000){rRotation = 1; lRotation = 1; toggle = 1;}
-	else if(on == 1 && lSteps >= 4000){rRotation = 0; rSteps = 0; toggle = 1;}
-	else{rRotation = 0; lRotation = 0;}
+	/*
+	if(on == 1 && backward == 1 && forward == 1 && rSteps >= 4000 && lSteps >= 4000){on = 0;} 
+	else if (on == 1 && backward == 1 && rotate == 1 && forward == 0){lRotation = 0; executed2 = 1; toggle = 1;}
+	else if(on == 1 && forward == 1 && lSteps >= 4000 && triggerSensor == 0 && backward == 0){rRotation = 0; rSteps = 0; toggle = 1;}
+	else if (on == 1 && (forward == 1 || backward == 1)){rRotation = 1; lRotation = 1; toggle = 1;}
+	else{rRotation = 0; lRotation = 0;}*/
+	
+	// 
+	if(on == 1 && (backward == 1 || forward == 1) && (rotate == 1))
+		{
+			toggle = 1; lRotation = 1; rRotation = 1; rSteps = 0; lSteps = 0; rotate = 0;
+		}
+	
+	// 
+	else if(on == 1 && rotating == 1 && rotate == 0)
+	{
+		toggle = 1;
+		if(forward == 1){rRotation = 1; lRotation = 0;}
+		if(backward == 1){lRotation = 1; rRotation = 0;}
+	}
+	
+	else if(on == 1 && (forward == 1 || backward == 1) && rotate == 0)
+	{
+		rRotation = 1; lRotation = 1; toggle = 1;
+	}
+
+	else{rRotation = 0; lRotation = 0; on = 0;}
 
 
 }
 
 void GPIOPortA_Handler(void){
+	// On falling edge, say we have detected sometihng leaving and lower the trigger for the car to move again
+	if(GPIO_PORTA_DATA_R & 0x80){detected = 1; triggerSensor = 0;}
+	
+	// On rising edge, say we have sometihng in front of us and reset the steps to begin counting 360 deg
+	else{triggerSensor = 1; rSteps = 0; lSteps = 0;}
 	GPIO_PORTA_ICR_R = 0x80; // acknowledge
  
 }
