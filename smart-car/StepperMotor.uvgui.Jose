@@ -2625,9 +2625,9 @@
       </Doc>
       <Doc>
         <Name>.\StepperTestMain.c</Name>
-        <ColumnNumber>73</ColumnNumber>
-        <TopLine>180</TopLine>
-        <CurrentLine>220</CurrentLine>
+        <ColumnNumber>21</ColumnNumber>
+        <TopLine>101</TopLine>
+        <CurrentLine>135</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders>75,211</ContractedFolders>
         <PaneID>0</PaneID>

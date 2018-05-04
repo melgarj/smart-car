@@ -110,6 +110,7 @@ int main(void){
 			{
 				toggle = 0;
 				
+				
 				// Upon pressing SW1, forward = 1, move car forward
 				if(forward == 1)
 				{
@@ -121,7 +122,8 @@ int main(void){
 					StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){rotating = 1;}
+				if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){forward = 0; on = 0; rSteps = 0; lSteps = 0;}
+				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){rotating = 1; rSteps = 0; lSteps = 0;}
 				//////////////////////////////////////////////////
 				
 			}
@@ -132,10 +134,10 @@ int main(void){
 			if(rRotation == 1 ^ lRotation == 1)
 			{
 				toggle = 0;
-				
 				// When it is forward, we move the right wheel CCW and left wheel CW to perform a 90 deg left turn
 				if(forward == 1)
 				{
+					LIGHT = 0x02;
 					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				
@@ -145,7 +147,7 @@ int main(void){
 					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				if(rSteps >= 500 && lSteps >= 500){rotating = 0; rotate = 1; forward = 1;}
+				if(rSteps >= 500 && lSteps >= 500){rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08;}
 			}
 			
 		}
@@ -242,7 +244,7 @@ void SysTick_Handler(void){
 
 void GPIOPortA_Handler(void){
 	// On falling edge, say we have detected sometihng leaving and lower the trigger for the car to move again
-	if(GPIO_PORTA_DATA_R & 0x80){detected = 1; triggerSensor = 0;}
+	if(GPIO_PORTA_DATA_R & 0x80){detected = 1; triggerSensor = 0; rSteps = 0; lSteps = 0;}
 	
 	// On rising edge, say we have sometihng in front of us and reset the steps to begin counting 360 deg
 	else{triggerSensor = 1; rSteps = 0; lSteps = 0;}
