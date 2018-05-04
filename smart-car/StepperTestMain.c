@@ -66,7 +66,7 @@ int main(void){
 	unsigned int i=0;
 	PortF_Init();
 	PortA_Init();
-  Stepper_Init(160000); // 10 ms for stepper, *50 = 500 ms for LED flash
+  Stepper_Init(40000); // 10 ms for stepper, *50 = 500 ms for LED flash
 	EnableInterrupts();
 	LIGHT = 0x08;
 	
@@ -160,7 +160,7 @@ int main(void){
 				}
 				
 				// Upon completing a 90 deg turn, car will move forward
-				if(rSteps >= 1000 && lSteps >= 1000 && (forward == 1 || backward ==1)){
+				if(rSteps >= 1200 && lSteps >= 1200 && (forward == 1 || backward ==1)){
 					rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08; 
 					if(backward == 1){detected = 0;}
 				}
@@ -217,7 +217,7 @@ void GPIOPortF_Handler(void){
 	if(GPIO_PORTF_RIS_R & 0x01){forward = 1;}
 	
 	// Pressing SW2 moves car backward
-	if(GPIO_PORTF_RIS_R & 0x10){backward = 1;}
+	if(GPIO_PORTF_RIS_R & 0x10){backward = 1; detected =1;}
 	
 	// Any button press turns the car on
 	on = 1;
@@ -235,6 +235,9 @@ void SysTick_Handler(void){
 	else{rRotation = 0; lRotation = 0;}*/
 	
 	// Upon completion of a rotation, reset all and go forward again
+	// The clearing of the flag in the following statement causing a counter to begin again
+	// Because of this, if it does not ecounter something in the next 720 degrees, it will rotate again
+	// Viable fix: find a different way to flag rotate
 	if(on == 1 && (backward == 1 || forward == 1) && (rotate == 1))
 		{
 			toggle = 1; lRotation = 1; rRotation = 1; rSteps = 0; lSteps = 0; rotate = 0;
