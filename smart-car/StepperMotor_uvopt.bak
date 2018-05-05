@@ -396,10 +396,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>144</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>114</TopLine>
-      <CurrentLine>149</CurrentLine>
+      <TopLine>87</TopLine>
+      <CurrentLine>135</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\StepperTestMain.c</PathWithFileName>
       <FilenameWithoutPath>StepperTestMain.c</FilenameWithoutPath>
