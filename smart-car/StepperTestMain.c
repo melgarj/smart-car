@@ -53,6 +53,7 @@ unsigned int triggerSensor = 0;
 unsigned int detected = 0;
 unsigned int rotate = 0;
 unsigned int rotating =  0;
+unsigned int capRotations = 0;
 
 int main(void){
 	unsigned int i=0;
@@ -60,7 +61,7 @@ int main(void){
 	PortA_Init();
   Stepper_Init(40000); // 10 ms for stepper, *50 = 500 ms for LED flash
 	EnableInterrupts();
-	LIGHT = 0x08;
+	LIGHT = 0x04;
 	
 	
 	
@@ -76,25 +77,29 @@ int main(void){
 				// Upon pressing SW1, forward = 1, move car forward
 				if(forward == 1)
 				{
+					LIGHT = 0x08;
 					StepperR_CW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				// Upon pressing SW2, backward = 1, move card backward
 				if(backward == 1 && forward == 0)
 				{
+					LIGHT = 0x02;
 					StepperR_CCW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
-				// Upon rotating 360 deg, turn car off if it is moving forward, if backwards, begin a rotation
-				if(detected == 1 && rSteps >= 2000 && lSteps >= 2000){
-					if(forward == 1){forward = 0; on = 0;}
-					if (backward == 1){rotating = 1;}
-					rSteps = 0; lSteps = 0; 
+				// Upon turing 360 deg, turn car off if it is moving forward, if backwards, begin a rotation
+				if( (detected == 1 || backward == 1) && rSteps >= 2000 && lSteps >= 2000){
+					if(forward == 1 && backward == 0){forward = 0; on = 0;rSteps = 0; lSteps = 0; }
+					if (backward == 1 && rotate == 0){rotating = 1;rSteps = 0; lSteps = 0; }
 				}
 				
-				// Upon rotating 720 degrees, begin rotation if it is moving forward, if backwards stop the car
-				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){ // have a line for when rotate is <2
+				// Upon turning 720 degrees, begin rotation if it is moving forward, if backwards stop the car
+				if(forward == 1 && rSteps >= 4000 && lSteps  >= 4000){ // have a line for when rotate is <2		
+					if(detected == 0x00 && backward == 0) // If we have detected something, we do not want it to stop again after 720 deg rotation
+					{
 					rotating = 1; rSteps = 0; lSteps = 0;
-					if(detected == 1 && forward == 1){rotating = 0;} // Possible fix, will prevent rotation from occuring if it has not turned but detects
+					}
+					//if(detected == 1 && forward == 1){rotating = 0;} // Possible fix, will prevent rotation from occuring if it has not turned but detects
 					if(backward == 1){on = 0;}
 				}
 			}
@@ -109,21 +114,21 @@ int main(void){
 				// When it is forward, we move the right wheel CW and left wheel CCW to perform a 90 deg left turn
 				if(forward == 1)
 				{
-					LIGHT = 0x02;
+					LIGHT ^= 0x08;
 					StepperR_CW(); Stepper_CCW(0); rSteps += 1; lSteps += 1;
 				}
 				
 				// When it is backward, we move the right wheel CCW and left wheel CW to perform a 90 deg right turn
 				if(backward == 1)
 				{
-					LIGHT = 0x02;
+					LIGHT ^= 0x02;
 					StepperR_CCW(); Stepper_CW(0); rSteps += 1; lSteps += 1;
 				}
 				
 				// Upon completing a 90 deg turn, car will move forward
 				if(rSteps >= 1200 && lSteps >= 1200 && (forward == 1 || backward ==1)){
-					rotating = 0; rotate = 1; forward = 1; LIGHT = 0x08; 
-					if(backward == 1){detected = 0;}
+					rotating = 0; rotate = 1; forward = 1; //LIGHT = 0x08; 
+					if(backward == 1){detected = 0; }//backward = 0;}
 				}
 			}
 			
@@ -178,7 +183,7 @@ void GPIOPortF_Handler(void){
 	if(GPIO_PORTF_RIS_R & 0x10){forward = 1;}
 	
 	// Pressing SW2 moves car backward
-	if(GPIO_PORTF_RIS_R & 0x01){backward = 1; detected =1;}
+	if(GPIO_PORTF_RIS_R & 0x01){backward = 1; rSteps = 0; lSteps = 0; rotate = 0;}
 	
 	// Any button press turns the car on
 	on = 1;
@@ -192,13 +197,9 @@ void SysTick_Handler(void){
 	// The clearing of the flag in the following statement causing a counter to begin again
 	// Because of this, if it does not ecounter something in the next 720 degrees, it will rotate again
 	// Viable fix: find a different way to flag rotate
-	if(on == 1 && (backward == 1 || forward == 1) && (rotate == 1))
-		{
-			toggle = 1; lRotation = 1; rRotation = 1; rSteps = 0; lSteps = 0; rotate = 0; // make rotate == 2
-		}
-	
+
 	// If rotating begins, notify only one wheel should move forward
-	else if(on == 1 && rotating == 1 && rotate == 0)
+	if(on == 1 && rotating == 1 && rotate == 0)
 	{
 		toggle = 1;
 		if(forward == 1){rRotation = 1; lRotation = 0;}
@@ -206,23 +207,23 @@ void SysTick_Handler(void){
 	}
 	
 	// Regular forward movement
-	else if(on == 1 && (forward == 1 || backward == 1) && rotate == 0) //Other fix, remove rotate == 0
+	else if(on == 1 && (forward == 1 || backward == 1)) //Other fix, remove rotate == 0
 	{
 		rRotation = 1; lRotation = 1; toggle = 1;
 	}
 
 	// When no options available, stay in one spot
-	else{rRotation = 0; lRotation = 0; on = 0;}
+	else{rRotation = 0; lRotation = 0; on = 0; LIGHT = 0x04;}
 
 
 }
 
 void GPIOPortA_Handler(void){
 	// On falling edge, say we have detected sometihng leaving and lower the trigger for the car to move again
-	if(GPIO_PORTA_DATA_R & 0x80){detected = 1; triggerSensor = 0; rSteps = 0; lSteps = 0;}
+	if(GPIO_PORTA_DATA_R & 0x80){triggerSensor = 0; if(rotate == 1){capRotations = 1; detected = 1; rSteps= 0; lSteps = 0;}}
 	
 	// On rising edge, say we have sometihng in front of us and reset the steps to begin counting 360 deg
-	else{triggerSensor = 1; rSteps = 0; lSteps = 0;}
+	else{triggerSensor = 1; detected = 0;}
 	GPIO_PORTA_ICR_R = 0x80; // acknowledge
  
 }
